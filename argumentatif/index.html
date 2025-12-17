@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Library - Smart City Wonosobo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            list-style: none;
+            text-decoration: none;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, 
+                rgba(15, 23, 42, 0.95) 0%, 
+                rgba(30, 41, 59, 0.98) 25%, 
+                rgba(51, 65, 85, 0.95) 50%,
+                rgba(30, 41, 59, 0.98) 75%,
+                rgba(15, 23, 42, 0.95) 100%
+            );
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+                linear-gradient(45deg, rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(-45deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: auto, auto, 60px 60px, 60px 60px;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 50%;
+            animation: particleFloat 15s infinite ease-in-out;
+        }
+        
+        .particle:nth-child(1) { width: 4px; height: 4px; left: 10%; animation-delay: 0s; }
+        .particle:nth-child(2) { width: 6px; height: 6px; left: 20%; animation-delay: 3s; }
+        .particle:nth-child(3) { width: 3px; height: 3px; left: 30%; animation-delay: 6s; }
+        .particle:nth-child(4) { width: 8px; height: 8px; left: 40%; animation-delay: 9s; }
+        .particle:nth-child(5) { width: 5px; height: 5px; left: 50%; animation-delay: 12s; }
+
+        .main-title {
+            text-align: center;
+            padding: 80px 20px 60px;
+            color: white;
+            position: relative;
+            z-index: 10;
+        }
+
+        .main-title h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+
+        .main-title p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 400;
+        }
+
+        .video-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px 80px;
+        }
+
+        .video-section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 25px;
+        }
+
+        .video-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(16, 185, 129, 0.15));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .video-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(59, 130, 246, 0.3);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(16, 185, 129, 0.25));
+        }
+
+        .video-thumbnail {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(16, 185, 129, 0.3));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .video-thumbnail img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        .play-icon {
+            position: relative;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(16, 185, 129, 0.9));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 30px rgba(59, 130, 246, 0.4);
+            z-index: 2;
+        }
+
+        .video-card:hover .play-icon {
+            transform: scale(1.2);
+            box-shadow: 0 12px 40px rgba(59, 130, 246, 0.6);
+        }
+
+        .video-duration {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            z-index: 3;
+        }
+
+        .video-card-content {
+            padding: 20px;
+            color: white;
+        }
+
+        .video-card-content h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .video-card-meta {
+            display: flex;
+            gap: 15px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+        }
+
+        .video-card-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .video-card-description {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .video-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .video-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        body.modal-open {
+            overflow: hidden;
+        }
+
+        .modal-content {
+            width: 100%;
+            max-width: 1200px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.1));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .close-modal:hover {
+            background: rgba(239, 68, 68, 0.8);
+            transform: rotate(90deg);
+        }
+
+        .modal-video-player {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .modal-video-player iframe {
+            display: block;
+        }
+
+        .modal-video-info {
+            color: white;
+        }
+
+        .modal-video-info h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .modal-video-meta {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            flex-wrap: wrap;
+        }
+
+        .modal-video-description {
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        @keyframes particleFloat {
+            0%, 100% { 
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10%, 90% {
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+                opacity: 0.8;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-title h1 {
+                font-size: 2.5rem;
+            }
+
+            .video-container {
+                padding: 0 20px 40px;
+            }
+
+            .video-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .modal-content {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-title {
+                padding: 60px 15px 40px;
+            }
+
+            .main-title h1 {
+                font-size: 2rem;
+            }
+
+            .video-section-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <div class="main-title">
+        <h1>Video Library</h1>
+        <p>Argumentative Discussions on Smart City Development</p>
+    </div>
+
+    <div class="video-container">
+        <h2 class="video-section-title">
+            <i class="fas fa-play-circle"></i>
+            All Videos
+        </h2>
+        <div class="video-grid" id="videoGrid"></div>
+    </div>
+
+    <div class="video-modal" id="videoModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-video-player" id="modalVideo"></div>
+            <div class="modal-video-info">
+                <h2 id="modalTitle"></h2>
+                <div class="modal-video-meta" id="modalMeta"></div>
+                <p class="modal-video-description" id="modalDescription"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+       const videos = [
+            {
+                id: 1,
+                title: "The Dark Side of Smart Cities: How Technology Excludes the Vulnerable",
+                duration: "2:12",
+                views: "40,234",
+                date: "Nov 2025",
+                description: "Many people believe that Smart Cities make life easier. But is everyone really benefiting from this technology? This video critically examines how Smart City initiatives can actually widen social inequality—especially for elderly citizens, low-income communities, and individuals who lack digital literacy or access to stable internet.",
+                youtubeId: "fqR36ABqkFs",
+                thumbnail: "https://img.youtube.com/vi/fqR36ABqkFs/maxresdefault.jpg"
+            },
+            {
+                id: 2,
+                title: "based on Technology Access for Low-Income Communities Can smart cities subsidize digital access for low-income residents to ensure fairness in enjoying the benefits of smart cities?",
+                duration: "0:50",
+                views: "987",
+                date: "Nov 2025",
+                description: "Smart cities need to subsidize digital access for low-income communities to ensure fair access to technology-based services. Without subsidies, disadvantaged groups will be left behind and unable to access essential services such as education, public information, or digital economic opportunities. Furthermore, the participation of all citizens is essential for the optimal functioning of smart city systems. Therefore, subsidizing digital access is a strategic step to ensure that the benefits of smart cities are shared equally.",
+                youtubeId: "em7fxD2neHM",
+                thumbnail: "https://img.youtube.com/vi/em7fxD2neHM/maxresdefault.jpg"
+            },
+            {
+                id: 3,
+                title: "Green Building in Legal Policy: A Positive Transformation or Challenge?",
+                duration: "2:22",
+                views: "1,456",
+                date: "Nov 2025",
+                description: "Integrating green buildings into legal policy can reduce energy use, lower carbon emissions, and promote resource efficiency. Clear regulations encourage innovation in construction.",
+                youtubeId: "I1X6MBY2I2s",
+                thumbnail: "https://img.youtube.com/vi/I1X6MBY2I2s/hqdefault.jpg"
+            },
+            {
+                id: 4,
+                title: "Should Smart Cities Subsidize Digital Access for Low-Income Residents?",
+                duration: "1:38",
+                views: "892",
+                date: "Nov 2025",
+                description: "This video explores whether smart cities should subsidize digital access for low-income residents. Digital access has become a basic necessity in modern society.",
+                youtubeId: "9z5E3pMfA38",
+                thumbnail: "https://img.youtube.com/vi/9z5E3pMfA38/hqdefault.jpg"
+            },
+            {
+                id: 5,
+                title: "Economic Impact: Growth or Digital Divide?",
+                duration: "3:27",
+                views: "1,123",
+                date: "Nov 2025",
+                description: "A comprehensive debate on the economic implications of smart city development, analyzing whether technology-driven growth benefits all citizens or widens inequality.",
+                youtubeId: "LrfOJ60o3WU",
+                thumbnail: "https://img.youtube.com/vi/LrfOJ60o3WU/maxresdefault.jpg"
+            }
+        ];
+        function createVideoCard(video) {
+            return `
+                <div class="video-card" onclick="openModal(${video.id})">
+                    <div class="video-thumbnail">
+                        <img src="${video.thumbnail}" alt="${video.title}" loading="lazy">
+                        <div class="play-icon">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <span class="video-duration">${video.duration}</span>
+                    </div>
+                    <div class="video-card-content">
+                        <h3>${video.title}</h3>
+                        <div class="video-card-meta">
+                            <span><i class="fas fa-eye"></i> ${video.views}</span>
+                            <span><i class="fas fa-calendar"></i> ${video.date}</span>
+                        </div>
+                        <p class="video-card-description">${video.description}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function openModal(videoId) {
+            const video = videos.find(v => v.id === videoId);
+            if (!video) return;
+            
+            document.body.classList.add('modal-open');
+            
+            document.getElementById('modalVideo').innerHTML = `
+                <iframe 
+                    width="100%" 
+                    height="100%" 
+                    src="https://www.youtube.com/embed/${video.youtubeId}?autoplay=1" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen
+                    style="border-radius: 15px;">
+                </iframe>
+            `;
+            
+            document.getElementById('modalTitle').textContent = video.title;
+            document.getElementById('modalMeta').innerHTML = `
+                <span><i class="fas fa-clock"></i> ${video.duration}</span>
+                <span><i class="fas fa-eye"></i> ${video.views} views</span>
+                <span><i class="fas fa-calendar"></i> ${video.date}</span>
+            `;
+            document.getElementById('modalDescription').textContent = video.description;
+            
+            document.getElementById('videoModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.body.classList.remove('modal-open');
+            document.getElementById('videoModal').classList.remove('active');
+            document.getElementById('modalVideo').innerHTML = '';
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        document.getElementById('videoModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        // Generate video cards immediately
+        const videoGrid = document.getElementById('videoGrid');
+        videoGrid.innerHTML = videos.map(video => createVideoCard(video)).join('');
+        
+        console.log('Video Library loaded with', videos.length, 'videos');
+    </script>
+</body>
+</html>
