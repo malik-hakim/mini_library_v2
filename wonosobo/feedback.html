@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Feedback - Smart City Wonosobo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            list-style: none;
+            text-decoration: none;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, 
+                rgba(15, 23, 42, 0.95) 0%, 
+                rgba(30, 41, 59, 0.98) 25%, 
+                rgba(51, 65, 85, 0.95) 50%,
+                rgba(30, 41, 59, 0.98) 75%,
+                rgba(15, 23, 42, 0.95) 100%
+            );
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Enhanced background effects */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+                linear-gradient(45deg, rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(-45deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: auto, auto, 60px 60px, 60px 60px;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        /* Floating particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 50%;
+            animation: particleFloat 15s infinite ease-in-out;
+        }
+        
+        .particle:nth-child(1) { width: 4px; height: 4px; left: 10%; animation-delay: 0s; }
+        .particle:nth-child(2) { width: 6px; height: 6px; left: 20%; animation-delay: 3s; }
+        .particle:nth-child(3) { width: 3px; height: 3px; left: 30%; animation-delay: 6s; }
+        .particle:nth-child(4) { width: 8px; height: 8px; left: 40%; animation-delay: 9s; }
+        .particle:nth-child(5) { width: 5px; height: 5px; left: 50%; animation-delay: 12s; }
+        .particle:nth-child(6) { width: 7px; height: 7px; left: 60%; animation-delay: 2s; }
+
+        /* Header Navigation */
+        .header-nav {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(16, 185, 129, 0.15));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            padding: 15px 30px;
+            z-index: 100;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: white;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(16, 185, 129, 0.3));
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 120px 40px 60px;
+        }
+
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+            color: white;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .page-header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 400;
+        }
+
+        /* Feedback Container */
+        .feedback-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        /* Feedback Form */
+        .form-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(16, 185, 129, 0.15));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 30px;
+            animation: fadeInLeft 0.8s ease-out;
+        }
+
+        .form-card h2 {
+            color: white;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+        }
+
+        .form-description {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            color: white;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: rgba(59, 130, 246, 0.5);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .rating-group {
+            margin-bottom: 25px;
+        }
+
+        .rating-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .rating-star {
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .rating-star:hover,
+        .rating-star.active {
+            color: #fbbf24;
+            transform: scale(1.1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px 30px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(16, 185, 129, 0.8));
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 1), rgba(16, 185, 129, 1));
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Recent Feedback Display */
+        .feedback-display {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(16, 185, 129, 0.15));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 30px;
+            animation: fadeInRight 0.8s ease-out;
+        }
+
+        .feedback-display h2 {
+            color: white;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+        }
+
+        .feedback-list {
+            display: grid;
+            gap: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .feedback-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .feedback-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            border-left-color: #3b82f6;
+        }
+
+        .feedback-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .feedback-rating {
+            display: flex;
+            gap: 3px;
+        }
+
+        .feedback-rating .star {
+            color: #fbbf24;
+            font-size: 0.9rem;
+        }
+
+        .feedback-rating .star.empty {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .feedback-time {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+
+        .feedback-content {
+            color: white;
+            margin-bottom: 10px;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .feedback-message {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .feedback-author {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            grid-column: span 2;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(16, 185, 129, 0.15));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 30px;
+            margin-top: 30px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .stats-header {
+            color: white;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #10b981;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-description {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+        }
+
+        /* Keyframe Animations */
+        @keyframes particleFloat {
+            0%, 100% { 
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10%, 90% {
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            0% {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            0% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 100px 20px 40px;
+            }
+
+            .page-header h1 {
+                font-size: 2.2rem;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .feedback-container {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-section {
+                grid-column: span 1;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 100px 15px 30px;
+            }
+
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .form-card,
+            .feedback-display,
+            .stats-section {
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+<body>
+    <!-- Animated Particles -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <!-- Header Navigation -->
+    <nav class="header-nav">
+        <a href="#" class="nav-logo">
+            <i class="fas fa-city"></i>
+            <span>Smart Wonosobo</span>
+        </a>
+        <div class="nav-links">
+            <a href="../index.html" class="nav-link">
+                <i class="fas fa-home"></i>
+                <span>Beranda</span>
+            </a>
+            <a href="index.html" class="nav-link">
+                <i class="fas fa-city"></i>
+                <span>Implementation</span>
+            </a>
+            <a href="feedback.html" class="nav-link">
+                <i class="fas fa-comments"></i>
+                <span>Feedback</span>
+            </a>
+            <a href="pages.html" class="nav-link active">
+                <i class="fas fa-question-circle"></i>
+                <span>Quiz</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>
+                <i class="fas fa-comments"></i>
+                Feedback
+            </h1>
+            <p>Help us improve your experience with the website of Group 1 SIKC 3C</p>
+        </div>
+
+        <!-- Feedback Container -->
+        <div class="feedback-container">
+            <!-- Feedback Form -->
+            <div class="form-card">
+                <h2>
+                    <i class="fas fa-paper-plane"></i>
+                    Share Your Feedback
+                </h2>
+                <p class="form-description">
+                    Your feedback is valuable to us! Please share your experience using our Smart City Wonosobo website. 
+                    Let us know what works well and what can be improved.
+                </p>
+
+                <form id="websiteFeedbackForm">
+                    <div class="form-group">
+                        <label for="feedbackTitle">Subject</label>
+                        <input type="text" id="feedbackTitle" placeholder="Brief summary of your feedback" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="feedbackMessage">Your Feedback</label>
+                        <textarea id="feedbackMessage" rows="5" placeholder="Please describe your experience, suggestions, or any issues you encountered..." required></textarea>
+                    </div>
+
+                    <div class="rating-group">
+                        <label>Overall Rating</label>
+                        <div class="rating-container">
+                            <span class="rating-star" data-rating="1">★</span>
+                            <span class="rating-star" data-rating="2">★</span>
+                            <span class="rating-star" data-rating="3">★</span>
+                            <span class="rating-star" data-rating="4">★</span>
+                            <span class="rating-star" data-rating="5">★</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="feedbackName">Your Name (Optional)</label>
+                        <input type="text" id="feedbackName" placeholder="Your name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="feedbackEmail">Email (Optional)</label>
+                        <input type="email" id="feedbackEmail" placeholder="your.email@example.com">
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-paper-plane"></i>
+                        Submit Feedback
+                    </button>
+                </form>
+            </div>
+
+            <!-- Recent Feedback Display -->
+            <div class="feedback-display">
+                <h2>
+                    <i class="fas fa-history"></i>
+                    Recent Website Feedback
+                </h2>
+
+                <div class="feedback-list" id="feedbackList">
+                    <!-- Sample feedback items -->
+                    <div class="feedback-item">
+                        <div class="feedback-header">
+                            <div class="feedback-rating">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                            </div>
+                            <div class="feedback-time">2 days ago</div>
+                        </div>
+                        <div class="feedback-content">Great user interface and easy navigation!</div>
+                        <div class="feedback-message">I really love the new design of the Smart City website. The interactive map feature is amazing and very helpful to see real-time data about our city.</div>
+                        <div class="feedback-author">— Sarah M.</div>
+                    </div>
+                    
+                    <div class="feedback-item">
+                        <div class="feedback-header">
+                            <div class="feedback-rating">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star empty">★</span>
+                            </div>
+                            <div class="feedback-time">5 days ago</div>
+                        </div>
+                        <div class="feedback-content">Good website, but needs mobile optimization</div>
+                        <div class="feedback-message">The website looks great on desktop, but some features are hard to use on mobile devices. Maybe consider improving the mobile responsiveness.</div>
+                        <div class="feedback-author">— Ahmad R.</div>
+                    </div>
+
+                    <div class="feedback-item">
+                        <div class="feedback-header">
+                            <div class="feedback-rating">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                            </div>
+                            <div class="feedback-time">1 week ago</div>
+                        </div>
+                        <div class="feedback-content">Excellent information and very informative</div>
+                        <div class="feedback-message">This website provides comprehensive information about Wonosobo's smart city initiatives. The data visualization is top-notch!</div>
+                        <div class="feedback-author">— Dr. Maria K.</div>
+                    </div>
+
+                    <div class="feedback-item">
+                        <div class="feedback-header">
+                            <div class="feedback-rating">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star empty">★</span>
+                                <span class="star empty">★</span>
+                            </div>
+                            <div class="feedback-time">1 week ago</div>
+                        </div>
+                        <div class="feedback-content">Loading time could be faster</div>
+                        <div class="feedback-message">The website content is good but takes quite long to load, especially the interactive features. Please consider optimizing performance.</div>
+                        <div class="feedback-author">— Budi S.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Section -->
+        <div class="stats-section">
+            <h2 class="stats-header">
+                <i class="fas fa-chart-bar"></i>
+                Website Feedback Statistics
+            </h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalFeedback">89</div>
+                    <div class="stat-label">Total Feedback</div>
+                    <div class="stat-description">Received this month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">4.2</div>
+                    <div class="stat-label">Average Rating</div>
+                    <div class="stat-description">Out of 5 stars</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">76%</div>
+                    <div class="stat-label">Satisfaction Rate</div>
+                    <div class="stat-description">4+ star ratings</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">23</div>
+                    <div class="stat-label">Improvements Made</div>
+                    <div class="stat-description">Based on feedback</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let selectedRating = 0;
+
+            // Rating system functionality
+            const ratingStars = document.querySelectorAll('.rating-star');
+            ratingStars.forEach((star, index) => {
+                star.addEventListener('click', function() {
+                    selectedRating = index + 1;
+                    updateRatingDisplay();
+                });
+
+                star.addEventListener('mouseenter', function() {
+                    highlightStars(index + 1);
+                });
+            });
+
+            document.querySelector('.rating-container').addEventListener('mouseleave', function() {
+                updateRatingDisplay();
+            });
+
+            function highlightStars(rating) {
+                ratingStars.forEach((star, index) => {
+                    if (index < rating) {
+                        star.classList.add('active');
+                    } else {
+                        star.classList.remove('active');
+                    }
+                });
+            }
+
+            function updateRatingDisplay() {
+                highlightStars(selectedRating);
+            }
+
+            // Form submission
+            const form = document.getElementById('websiteFeedbackForm');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitWebsiteFeedback();
+            });
+
+            // Submit feedback function
+            function submitWebsiteFeedback() {
+                const title = document.getElementById('feedbackTitle').value;
+                const message = document.getElementById('feedbackMessage').value;
+                const name = document.getElementById('feedbackName').value;
+                const email = document.getElementById('feedbackEmail').value;
+
+                if (!title || !message || selectedRating === 0) {
+                    showAlert('Please fill in the subject, message, and rating fields', 'error');
+                    return;
+                }
+
+                // Create new feedback item
+                const feedbackList = document.getElementById('feedbackList');
+                const newFeedback = document.createElement('div');
+                newFeedback.className = 'feedback-item';
+                newFeedback.style.opacity = '0';
+                newFeedback.style.transform = 'translateY(20px)';
+
+                // Generate star rating display
+                let starsHtml = '';
+                for (let i = 1; i <= 5; i++) {
+                    starsHtml += `<span class="star${i <= selectedRating ? '' : ' empty'}">★</span>`;
+                }
+
+                newFeedback.innerHTML = `
+                    <div class="feedback-header">
+                        <div class="feedback-rating">
+                            ${starsHtml}
+                        </div>
+                        <div class="feedback-time">Just now</div>
+                    </div>
+                    <div class="feedback-content">${title}</div>
+                    <div class="feedback-message">${message}</div>
+                    <div class="feedback-author">— ${name || 'Anonymous'}</div>
+                `;
+
+                feedbackList.insertBefore(newFeedback, feedbackList.firstChild);
+
+                // Animate in
+                setTimeout(() => {
+                    newFeedback.style.opacity = '1';
+                    newFeedback.style.transform = 'translateY(0)';
+                    newFeedback.style.transition = 'all 0.5s ease';
+                }, 100);
+
+                // Reset form
+                form.reset();
+                selectedRating = 0;
+                updateRatingDisplay();
+
+                // Update statistics
+                updateStats();
+
+                // Show success message
+                showAlert('Thank you for your feedback! Your input helps us improve the website experience.', 'success');
+            }
+
+            // Update statistics
+            function updateStats() {
+                const totalFeedback = document.getElementById('totalFeedback');
+                if (totalFeedback) {
+                    const currentTotal = parseInt(totalFeedback.textContent);
+                    totalFeedback.textContent = currentTotal + 1;
+                    
+                    // Animate counter
+                    totalFeedback.style.color = '#3b82f6';
+                    setTimeout(() => {
+                        totalFeedback.style.color = '#10b981';
+                    }, 500);
+                }
+            }
+
+            // Show alert/notification
+            function showAlert(message, type) {
+                const alert = document.createElement('div');
+                alert.style.cssText = `
+                    position: fixed;
+                    top: 100px;
+                    right: 20px;
+                    background: linear-gradient(135deg, ${type === 'success' ? 'rgba(34, 197, 94, 0.9), rgba(16, 185, 129, 0.9)' : 'rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.9)'});
+                    color: white;
+                    padding: 15px 25px;
+                    border-radius: 15px;
+                    z-index: 1001;
+                    animation: slideInRight 0.5s ease;
+                    max-width: 350px;
+                    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+                `;
+                alert.innerHTML = `
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i>
+                    <span style="margin-left: 10px;">${message}</span>
+                `;
+                
+                document.body.appendChild(alert);
+                
+                setTimeout(() => {
+                    alert.style.animation = 'slideOutRight 0.5s ease';
+                    setTimeout(() => alert.remove(), 500);
+                }, 4000);
+            }
+
+            // Smooth scrolling for feedback list
+            const feedbackList = document.getElementById('feedbackList');
+            feedbackList.style.scrollBehavior = 'smooth';
+
+            // Add hover effects to feedback items
+            const feedbackItems = document.querySelectorAll('.feedback-item');
+            feedbackItems.forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px) scale(1.02)';
+                });
+                
+                item.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            console.log('Website Feedback page initialized successfully!');
+        });
+
+        // Navigation function
+        function goBack() {
+            // You can customize this to navigate to your main page
+            window.history.back();
+        }
+
+        // Add some interactive elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate stat cards on scroll
+            const statCards = document.querySelectorAll('.stat-card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animation = 'fadeInUp 0.6s ease-out';
+                    }
+                });
+            });
+
+            statCards.forEach(card => observer.observe(card));
+
+            // Add ripple effect to submit button
+            const submitBtn = document.querySelector('.submit-btn');
+            submitBtn.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.cssText = `
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${x}px;
+                    top: ${y}px;
+                    background: rgba(255, 255, 255, 0.3);
+                    border-radius: 50%;
+                    transform: scale(0);
+                    animation: ripple 0.6s ease-out;
+                    pointer-events: none;
+                `;
+                
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(ripple);
+                
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        // Add ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                0% {
+                    transform: scale(0);
+                    opacity: 1;
+                }
+                100% {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

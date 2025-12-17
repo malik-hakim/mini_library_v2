@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Society</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, 
+                rgba(15, 23, 42, 0.95) 0%, 
+                rgba(30, 41, 59, 0.98) 25%, 
+                rgba(51, 65, 85, 0.95) 50%,
+                rgba(30, 41, 59, 0.98) 75%,
+                rgba(15, 23, 42, 0.95) 100%
+            );
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Enhanced background effects matching main site */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+                linear-gradient(45deg, rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(-45deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: auto, auto, 60px 60px, 60px 60px;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        /* Floating particles matching main design */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 50%;
+            animation: particleFloat 15s infinite ease-in-out;
+        }
+        
+        .particle:nth-child(1) { width: 4px; height: 4px; left: 10%; animation-delay: 0s; }
+        .particle:nth-child(2) { width: 6px; height: 6px; left: 20%; animation-delay: 3s; }
+        .particle:nth-child(3) { width: 3px; height: 3px; left: 30%; animation-delay: 6s; }
+        .particle:nth-child(4) { width: 8px; height: 8px; left: 40%; animation-delay: 9s; }
+        .particle:nth-child(5) { width: 5px; height: 5px; left: 50%; animation-delay: 12s; }
+        .particle:nth-child(6) { width: 7px; height: 7px; left: 60%; animation-delay: 2s; }
+        .particle:nth-child(7) { width: 4px; height: 4px; left: 70%; animation-delay: 5s; }
+        .particle:nth-child(8) { width: 6px; height: 6px; left: 80%; animation-delay: 8s; }
+        .particle:nth-child(9) { width: 5px; height: 5px; left: 90%; animation-delay: 11s; }
+       
+        
+        /* Header section with unified styling */
+        .header-section {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(16, 185, 129, 0.2));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 80px 60px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            margin: 120px 40px 40px 40px;
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 400px;
+            height: 400px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 50%;
+            z-index: 0;
+            animation: pulseGlow 4s ease-in-out infinite;
+        }
+        
+        .header-section::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(16, 185, 129, 0.08);
+            border-radius: 50%;
+            z-index: 0;
+            animation: pulseGlow 6s ease-in-out infinite reverse;
+        }
+        
+        .header-section > * {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header-section h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+            animation: titleGlow 3s ease-in-out infinite;
+        }
+        
+        .header-section p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            text-align: justify;
+            color: rgba(255, 255, 255, 0.9);
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        .references-btn {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(16, 185, 129, 0.8));
+            backdrop-filter: blur(20px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+            animation: buttonFloat 2s ease-in-out infinite;
+        }
+        
+        .references-btn:hover {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 1), rgba(16, 185, 129, 1));
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.4);
+        }
+        
+        /* Content section with unified styling */
+        .content-section {
+            padding: 80px 60px;
+            position: relative;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(16, 185, 129, 0.15));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            margin: 40px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .content-section::before {
+            content: '';
+            position: absolute;
+            top: 20%;
+            right: 5%;
+            width: 180px;
+            height: 180px;
+            background: rgba(59, 130, 246, 0.08);
+            border-radius: 50%;
+            z-index: 0;
+            animation: floatRotate 8s ease-in-out infinite;
+        }
+        
+        .content-section::after {
+            content: '';
+            position: absolute;
+            bottom: 10%;
+            left: 3%;
+            width: 220px;
+            height: 220px;
+            background: rgba(16, 185, 129, 0.06);
+            border-radius: 50%;
+            z-index: 0;
+            animation: floatRotate 10s ease-in-out infinite reverse;
+        }
+        
+        .content-section > * {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .content-section h2 {
+            color: white;
+            font-size: 2.8rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+            animation: fadeInDown 1s ease-out;
+        }
+        
+        .underline {
+            width: 120px;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #10b981);
+            margin: 0 auto 60px auto;
+            border-radius: 2px;
+            animation: expandLine 1.5s ease-out;
+        }
+        
+        .content-text {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+            animation: fadeInUp 1.2s ease-out;
+        }
+        
+        .content-text .left-column,
+        .content-text .right-column {
+            flex: 1;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.9);
+            text-align: justify;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(16, 185, 129, 0.2));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .content-text .left-column:hover,
+        .content-text .right-column:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(59, 130, 246, 0.3);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(16, 185, 129, 0.3));
+        }
+        
+        .footer-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 60px;
+            animation: fadeInUp 1.5s ease-out;
+        }
+        
+        .footer-btn {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(16, 185, 129, 0.8));
+            backdrop-filter: blur(20px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+        
+        .footer-btn:hover {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 1), rgba(16, 185, 129, 1));
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.4);
+        }
+        
+        /* Enhanced Social Icons matching main site */
+       
+        
+        /* Keyframe Animations */
+        @keyframes particleFloat {
+            0%, 100% { 
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10%, 90% {
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+                opacity: 0.8;
+            }
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { 
+                transform: scale(1);
+                opacity: 0.1;
+            }
+            50% { 
+                transform: scale(1.1);
+                opacity: 0.2;
+            }
+        }
+        
+        @keyframes titleGlow {
+            0%, 100% { 
+                filter: drop-shadow(0 0 10px rgba(255,255,255,0.1));
+            }
+            50% { 
+                filter: drop-shadow(0 0 20px rgba(255,255,255,0.3));
+            }
+        }
+        
+        @keyframes buttonFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        @keyframes floatRotate {
+            0%, 100% { 
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.08;
+            }
+            50% { 
+                transform: translateY(-20px) rotate(180deg);
+                opacity: 0.15;
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes expandLine {
+            from {
+                width: 0;
+                opacity: 0;
+            }
+            to {
+                width: 120px;
+                opacity: 1;
+            }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav {
+                right: 20px;
+                gap: 6px;
+                padding: 6px;
+            }
+            
+            .nav-item {
+                font-size: 12px;
+                padding: 10px 16px;
+            }
+            
+            .header-section, .content-section {
+                padding: 60px 30px;
+                margin: 20px;
+            }
+            
+            .header-section h1 {
+                font-size: 2.5rem;
+            }
+            
+            .content-section h2 {
+                font-size: 2rem;
+            }
+            
+            .content-text {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .footer-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .nav {
+                flex-direction: column;
+                gap: 8px;
+                top: 20px;
+                right: 20px;
+            }
+            
+            .header-section, .content-section {
+                margin: 15px;
+                padding: 40px 20px;
+            }
+            
+            .social-icons {
+                right: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Particles -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+    
+    <div class="header-section">
+        <h1>Smart Society</h1>
+<p>Smart society focuses on humans as the main element of a city, where interactions between citizens become stronger and more seamless with existing technological advances. There are three elements in a smart society, namely: 1. Efficient community interaction (community), 2. Efficient educational ecosystem (learning), 3. Community security system (security).</p>
+            <a href="https://smartcity.bantulkab.go.id/dimensi/index/983.html#:~:text=Smart%20society%20memfokuskan%20pada%20manusia,dengan%20kemajuan%20teknologi%20yang%20ada." class="footer-btn">References : smartcity.bantulkab.go.id</a>
+           
+    </div>
+    
+    <div class="content-section">
+        <h2>Success Indicators</h2>
+        <div class="underline"></div>
+        
+        <div class="content-text">
+            <div class="left-column">
+<p>Smart society as an integral part of the smart city concept emphasizes the important role of society in creating a smarter and more sustainable city ecosystem. The four main variables that are indicators of success, namely community, learning, security and creativity, are interconnected in building the quality of life of city residents. The community is the center of a smart society because it reflects the active participation of the community in every smart city program, while learning strengthens digital literacy and citizens' skills to be able to adapt to constantly changing technological developments.</p>
+            </div>
+            <div class="right-column">
+<p>Apart from that, security functions as a pillar that guarantees data protection, trust and people's comfort in using digital services. Creativity complements other variables by encouraging the birth of new, sustainable innovations to answer urban challenges. With the synergy of these four variables, a smart society is able to create a participatory, adaptive and innovative city environment, while improving community welfare and city competitiveness at the global level.</p>
+            </div>
+        </div>
+        
+        <div class="footer-buttons">
+            <a href="https://ieeexplore.ieee.org/abstract/document/9672779" class="footer-btn">References : ieeexplore.ieee.org</a>
+
+        </div>
+    </div>
+    
+    <script>
+        // Enhanced interactions matching main site
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click events to social icons
+            const socialIcons = document.querySelectorAll('.social-icon');
+            socialIcons.forEach((icon, index) => {
+                icon.addEventListener('click', function() {
+                    const actions = ['Mobile App', 'Website', 'Email Contact'];
+                    alert('Navigate to: ' + actions[index]);
+                });
+            });
+            
+            // Enhanced hover effects
+            document.querySelectorAll('.left-column, .right-column, .references-btn, .footer-btn').forEach(element => {
+                element.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px) scale(1.02)';
+                });
+                
+                element.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

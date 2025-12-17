@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart City Quiz - Wonosobo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            list-style: none;
+            text-decoration: none;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, 
+                rgba(15, 23, 42, 0.95) 0%, 
+                rgba(30, 41, 59, 0.98) 25%, 
+                rgba(51, 65, 85, 0.95) 50%,
+                rgba(30, 41, 59, 0.98) 75%,
+                rgba(15, 23, 42, 0.95) 100%
+            );
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+                linear-gradient(45deg, rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(-45deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: auto, auto, 60px 60px, 60px 60px;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 50%;
+            animation: particleFloat 15s infinite ease-in-out;
+        }
+        
+        .particle:nth-child(1) { width: 4px; height: 4px; left: 10%; animation-delay: 0s; }
+        .particle:nth-child(2) { width: 6px; height: 6px; left: 20%; animation-delay: 3s; }
+        .particle:nth-child(3) { width: 3px; height: 3px; left: 30%; animation-delay: 6s; }
+        .particle:nth-child(4) { width: 8px; height: 8px; left: 40%; animation-delay: 9s; }
+        .particle:nth-child(5) { width: 5px; height: 5px; left: 50%; animation-delay: 12s; }
+        .particle:nth-child(6) { width: 7px; height: 7px; left: 60%; animation-delay: 2s; }
+
+        .main-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+            color: white;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .page-header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 400;
+        }
+
+        .language-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .lang-btn {
+            padding: 12px 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .lang-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .lang-btn.active {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(16, 185, 129, 0.8));
+            border-color: transparent;
+        }
+
+        .quiz-container {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(16, 185, 129, 0.15));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 30px;
+            margin-bottom: 30px;
+            animation: fadeInUp 0.8s ease-out;
+            display: none;
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .quiz-progress {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .question-container {
+            margin-bottom: 30px;
+        }
+
+        .question-text {
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .options-container {
+            display: grid;
+            gap: 15px;
+        }
+
+        .option {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px 20px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option:hover:not(.disabled) {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .option.selected {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        .option.correct {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.5);
+        }
+
+        .option.incorrect {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .option-letter {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .option.selected .option-letter {
+            background: rgba(59, 130, 246, 0.3);
+        }
+
+        .option.correct .option-letter {
+            background: rgba(16, 185, 129, 0.3);
+        }
+
+        .option.incorrect .option-letter {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        .feedback-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(16, 185, 129, 0.15));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 30px;
+            color: white;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: none;
+            animation: popupAppear 0.5s ease-out;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .feedback-popup.show {
+            display: block;
+        }
+
+        .feedback-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .feedback-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .feedback-message {
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .feedback-continue {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(16, 185, 129, 0.8));
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .feedback-continue:hover {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 1), rgba(16, 185, 129, 1));
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .nav-btn {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(16, 185, 129, 0.8));
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 1), rgba(16, 185, 129, 1));
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .nav-btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .results-container {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(16, 185, 129, 0.15));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 30px;
+            text-align: center;
+            color: white;
+            animation: fadeInUp 0.8s ease-out;
+            display: none;
+        }
+
+        .results-header {
+            margin-bottom: 20px;
+        }
+
+        .score-display {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .score-text {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .results-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .restart-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(16, 185, 129, 0.8));
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .restart-btn:hover {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 1), rgba(16, 185, 129, 1));
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        .finish-btn {
+            padding: 15px 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .finish-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        @keyframes particleFloat {
+            0%, 100% { 
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10%, 90% {
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes popupAppear {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 40px 20px;
+            }
+
+            .page-header h1 {
+                font-size: 2.2rem;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .quiz-container {
+                padding: 20px;
+            }
+
+            .feedback-popup {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 30px 15px;
+            }
+
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .quiz-container {
+                padding: 15px;
+            }
+
+            .results-buttons {
+                flex-direction: column;
+            }
+
+            .restart-btn, .finish-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+<body>
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <div class="main-container">
+        <div class="page-header">
+            <h1>
+                <i class="fas fa-question-circle"></i>
+                <span id="headerTitle">Smart City Quiz</span>
+            </h1>
+            <p id="headerSubtitle">Uji pengetahuan Anda tentang Smart City Wonosobo</p>
+        </div>
+
+        <div class="language-selector" id="languageSelector">
+            <button class="lang-btn active" id="langId" onclick="setLanguage('id')">
+                <i class="fas fa-flag"></i>
+                Bahasa Indonesia
+            </button>
+            <button class="lang-btn" id="langEn" onclick="setLanguage('en')">
+                <i class="fas fa-flag"></i>
+                English
+            </button>
+        </div>
+
+        <div class="quiz-container" id="quizContainer">
+            <div class="quiz-header">
+                <h2 id="quizTitle">Kuis Smart City</h2>
+                <div class="quiz-progress" id="progressText">Pertanyaan 1 dari 10</div>
+            </div>
+
+            <div class="question-container">
+                <div class="question-text" id="questionText"></div>
+                <div class="options-container" id="optionsContainer"></div>
+            </div>
+
+            <div class="navigation-buttons">
+                <button class="nav-btn" id="nextBtn" style="display: none;">
+                    <span id="nextBtnText">Lanjut</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="results-container" id="resultsContainer">
+            <div class="results-header">
+                <h2 id="resultsTitle">Hasil Kuis</h2>
+            </div>
+            <div class="score-display" id="scoreDisplay">0/10</div>
+            <div class="score-text" id="scoreText"></div>
+            <div class="results-buttons">
+                <button class="restart-btn" id="restartBtn">
+                    <i class="fas fa-redo"></i>
+                    <span id="restartBtnText">Ulangi Kuis</span>
+                </button>
+                <button class="finish-btn" id="finishBtn" onclick="window.location.href='pages.html'">
+                    <i class="fas fa-check"></i>
+                    <span id="finishBtnText">Selesai</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="feedback-popup" id="feedbackPopup">
+        <div class="feedback-icon" id="feedbackIcon"></div>
+        <div class="feedback-title" id="feedbackTitle"></div>
+        <div class="feedback-message" id="feedbackMessage"></div>
+        <button class="feedback-continue" id="feedbackContinue">
+            <span id="feedbackContinueText">Lanjut</span>
+            <i class="fas fa-arrow-right"></i>
+        </button>
+    </div>
+
+    <script>
+        const translations = {
+            id: {
+                headerTitle: "Smart City Quiz",
+                headerSubtitle: "Uji pengetahuan Anda tentang Smart City Wonosobo",
+                quizTitle: "Kuis Smart City",
+                progressText: "Pertanyaan",
+                of: "dari",
+                nextBtn: "Lanjut",
+                resultsTitle: "Hasil Kuis",
+                restartBtn: "Ulangi Kuis",
+                finishBtn: "Selesai",
+                correct: "Benar!",
+                incorrect: "Salah!",
+                correctAnswer: "Jawaban yang benar adalah:",
+                scoreExcellent: "Luar biasa! Anda ahli Smart City Wonosobo!",
+                scoreGood: "Bagus! Pengetahuan Anda tentang Smart City Wonosobo cukup baik.",
+                scoreFair: "Cukup baik. Tingkatkan lagi pengetahuan Anda tentang Smart City Wonosobo.",
+                scorePoor: "Yuk belajar lagi tentang Smart City Wonosobo!",
+                continueBtn: "Lanjut"
+            },
+            en: {
+                headerTitle: "Smart City Quiz",
+                headerSubtitle: "Test your knowledge about Smart City Wonosobo",
+                quizTitle: "Smart City Quiz",
+                progressText: "Question",
+                of: "of",
+                nextBtn: "Next",
+                resultsTitle: "Quiz Results",
+                restartBtn: "Restart Quiz",
+                finishBtn: "Finish",
+                correct: "Correct!",
+                incorrect: "Incorrect!",
+                correctAnswer: "The correct answer is:",
+                scoreExcellent: "Excellent! You are a Smart City Wonosobo expert!",
+                scoreGood: "Good! Your knowledge about Smart City Wonosobo is quite good.",
+                scoreFair: "Fair. Keep improving your knowledge about Smart City Wonosobo.",
+                scorePoor: "Let's learn more about Smart City Wonosobo!",
+                continueBtn: "Continue"
+            }
+        };
+
+        const quizData = [
+            {
+                questionEn: "Which technology is most important in enabling Smart City development?",
+                questionId: "Teknologi apa yang paling penting dalam mendukung pengembangan Smart City?",
+                optionsEn: [
+                    "Traditional mechanical tools",
+                    "Information and Communication Technology (ICT) and Internet of Things (IoT)",
+                    "Manual data collection from citizens",
+                    "Limiting urban digitalization"
+                ],
+                optionsId: [
+                    "Alat mekanis tradisional",
+                    "Teknologi Informasi dan Komunikasi (ICT) serta Internet of Things (IoT)",
+                    "Pengumpulan data manual dari warga",
+                    "Membatasi digitalisasi perkotaan"
+                ],
+                answer: 1
+            },
+            {
+                questionEn: "Which of the following is NOT listed as a goal of a Smart City?",
+                questionId: "Berikut ini yang BUKAN tujuan dari Smart City adalah:",
+                optionsEn: [
+                    "Optimize public services to make them faster and more efficient",
+                    "Foster a dynamic economic climate and encourage innovation",
+                    "Create a safe, comfortable, and sustainable urban environment",
+                    "Restrict citizen involvement to maintain government control"
+                ],
+                optionsId: [
+                    "Mengoptimalkan layanan publik agar lebih cepat dan efisien",
+                    "Mendorong iklim ekonomi yang dinamis dan inovatif",
+                    "Menciptakan lingkungan perkotaan yang aman, nyaman, dan berkelanjutan",
+                    "Membatasi keterlibatan warga untuk menjaga kontrol pemerintah"
+                ],
+                answer: 3
+            },
+            {
+                questionEn: "What is the main purpose of the 'Pandawa Sakti' service in Wonosobo?",
+                questionId: "Apa tujuan utama layanan 'Pandawa Sakti' di Wonosobo?",
+                optionsEn: [
+                    "To promote local tourism through digital campaigns",
+                    "To simplify population administration digitally and efficiently",
+                    "To monitor public health data in real-time",
+                    "To support local MSMEs in accessing new markets"
+                ],
+                optionsId: [
+                    "Mempromosikan pariwisata lokal melalui kampanye digital",
+                    "Menyederhanakan administrasi kependudukan secara digital dan efisien",
+                    "Memantau data kesehatan masyarakat secara real-time",
+                    "membantu UMKM lokal mengakses pasar baru"
+                ],
+                answer: 1
+            },
+            {
+                questionEn: "The Smart Greenhouse program in Wonosobo mainly aims to:",
+                questionId: "Program Smart Greenhouse di Wonosobo terutama bertujuan untuk:",
+                optionsEn: [
+                    "Provide free food to the local community",
+                    "Replace traditional markets with digital platforms",
+                    "Develop modern agriculture using technology to improve crop yields",
+                    "Reduce urban traffic congestion using IoT sensors"
+                ],
+                optionsId: [
+                    "Menyediakan makanan gratis bagi masyarakat",
+                    "Menggantikan pasar tradisional dengan platform digital",
+                    "Mengembangkan pertanian modern dengan teknologi untuk meningkatkan hasil panen",
+                    "Mengurangi kemacetan lalu lintas dengan sensor IoT"
+                ],
+                answer: 2
+            },
+            {
+                questionEn: "Which platform supports Smart Economy in Wonosobo by promoting MSMEs digitally?",
+                questionId: "Platform apa yang mendukung Smart Economy di Wonosobo dengan mempromosikan UMKM secara digital?",
+                optionsEn: [
+                    "SITAWON",
+                    "AyoPromo",
+                    "Pandawa Sakti",
+                    "LaporBup"
+                ],
+                optionsId: [
+                    "SITAWON",
+                    "AyoPromo",
+                    "Pandawa Sakti",
+                    "LaporBup"
+                ],
+                answer: 1
+            },
+            {
+                questionEn: "What is the role of SITAWON in Smart Government?",
+                questionId: "Apa peran SITAWON dalam Smart Government?",
+                optionsEn: [
+                    "Provides online tax and revenue information management",
+                    "Supports citizen complaints handling",
+                    "Delivers online permit applications",
+                    "Presents disaster data to the public"
+                ],
+                optionsId: [
+                    "Menyediakan pengelolaan informasi pajak dan pendapatan daerah secara online",
+                    "Mendukung penanganan pengaduan masyarakat",
+                    "Menyediakan layanan perizinan online",
+                    "Menyajikan data kebencanaan kepada publik"
+                ],
+                answer: 0
+            },
+            {
+                questionEn: "Which platform provides disaster information through maps, tables, and graphs in Wonosobo?",
+                questionId: "Platform mana yang menyediakan informasi kebencanaan melalui peta, tabel, dan grafik di Wonosobo?",
+                optionsEn: [
+                    "JDIH",
+                    "SIKK",
+                    "LaporBup",
+                    "APRIZOB"
+                ],
+                optionsId: [
+                    "JDIH",
+                    "SIKK",
+                    "LaporBup",
+                    "APRIZOB"
+                ],
+                answer: 1
+            },
+            {
+                questionEn: "The JDIH platform in Wonosobo primarily provides:",
+                questionId: "Platform JDIH di Wonosobo terutama menyediakan:",
+                optionsEn: [
+                    "Real-time CCTV access",
+                    "Access to legal and regulatory documents",
+                    "Digital training for communities",
+                    "Financial reports and tax data"
+                ],
+                optionsId: [
+                    "Akses CCTV publik secara real-time",
+                    "Akses ke dokumen hukum dan regulasi",
+                    "Pelatihan digital bagi masyarakat",
+                    "Laporan keuangan dan data pajak"
+                ],
+                answer: 1
+            },
+            {
+                questionEn: "Which system allows citizens to file complaints digitally with guaranteed confidentiality?",
+                questionId: "Sistem mana yang memungkinkan warga mengajukan pengaduan secara digital dengan jaminan kerahasiaan?",
+                optionsEn: [
+                    "APRIZOB",
+                    "LaporBup",
+                    "SIKK",
+                    "AyoPromo"
+                ],
+                optionsId: [
+                    "APRIZOB",
+                    "LaporBup",
+                    "SIKK",
+                    "AyoPromo"
+                ],
+                answer: 1
+            },
+            {
+                questionEn: "What is the purpose of APRIZOB in Smart Branding?",
+                questionId: "Apa tujuan APRIZOB dalam Smart Branding?",
+                optionsEn: [
+                    "To manage disaster information visually",
+                    "To provide a system for online permits and licensing",
+                    "To promote agriculture technology for youth",
+                    "To improve real-time monitoring with CCTV"
+                ],
+                optionsId: [
+                    "Mengelola informasi kebencanaan secara visual",
+                    "Menyediakan sistem perizinan online",
+                    "Mempromosikan teknologi pertanian untuk generasi muda",
+                    "meningkatkan pemantauan kondisi publik dengan CCTV"
+                ],
+                answer: 1
+            }
+        ];
+
+        let currentLanguage = 'id';
+        let currentQuestion = 0;
+        let userAnswers = Array(quizData.length).fill(null);
+        let score = 0;
+        let answered = false;
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.getElementById('langId').classList.toggle('active', lang === 'id');
+            document.getElementById('langEn').classList.toggle('active', lang === 'en');
+            
+            const t = translations[lang];
+            document.getElementById('headerTitle').textContent = t.headerTitle;
+            document.getElementById('headerSubtitle').textContent = t.headerSubtitle;
+            document.getElementById('quizTitle').textContent = t.quizTitle;
+            document.getElementById('nextBtnText').textContent = t.nextBtn;
+            document.getElementById('restartBtnText').textContent = t.restartBtn;
+            document.getElementById('finishBtnText').textContent = t.finishBtn;
+            document.getElementById('resultsTitle').textContent = t.resultsTitle;
+            document.getElementById('feedbackContinueText').textContent = t.continueBtn;
+            
+            // Hide language selector and show quiz
+            document.getElementById('languageSelector').style.display = 'none';
+            document.getElementById('quizContainer').style.display = 'block';
+            
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const question = quizData[currentQuestion];
+            const t = translations[currentLanguage];
+            
+            document.getElementById('progressText').textContent = 
+                `${t.progressText} ${currentQuestion + 1} ${t.of} ${quizData.length}`;
+            
+            document.getElementById('questionText').textContent = 
+                currentLanguage === 'id' ? question.questionId : question.questionEn;
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            const optionLetters = ['A', 'B', 'C', 'D'];
+            const options = currentLanguage === 'id' ? question.optionsId : question.optionsEn;
+            
+            options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                
+                if (answered) {
+                    optionElement.classList.add('disabled');
+                    if (index === question.answer) {
+                        optionElement.classList.add('correct');
+                    }
+                    if (userAnswers[currentQuestion] === index && index !== question.answer) {
+                        optionElement.classList.add('incorrect');
+                    }
+                }
+                
+                optionElement.innerHTML = `
+                    <div class="option-letter">${optionLetters[index]}</div>
+                    <div class="option-content">${option}</div>
+                `;
+                
+                if (!answered) {
+                    optionElement.addEventListener('click', () => selectOption(index));
+                }
+                
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        function selectOption(index) {
+            if (answered) return;
+            
+            userAnswers[currentQuestion] = index;
+            answered = true;
+            
+            const question = quizData[currentQuestion];
+            const t = translations[currentLanguage];
+            const isCorrect = index === question.answer;
+            
+            // Show feedback popup
+            const feedbackPopup = document.getElementById('feedbackPopup');
+            const feedbackIcon = document.getElementById('feedbackIcon');
+            const feedbackTitle = document.getElementById('feedbackTitle');
+            const feedbackMessage = document.getElementById('feedbackMessage');
+            
+            if (isCorrect) {
+                feedbackIcon.innerHTML = '<i class="fas fa-check-circle" style="color: #10b981;"></i>';
+                feedbackTitle.textContent = t.correct;
+                feedbackTitle.style.color = '#10b981';
+                feedbackMessage.textContent = '';
+            } else {
+                feedbackIcon.innerHTML = '<i class="fas fa-times-circle" style="color: #ef4444;"></i>';
+                feedbackTitle.textContent = t.incorrect;
+                feedbackTitle.style.color = '#ef4444';
+                
+                const correctAnswerText = currentLanguage === 'id' ? 
+                    question.optionsId[question.answer] : 
+                    question.optionsEn[question.answer];
+                
+                feedbackMessage.textContent = `${t.correctAnswer} ${correctAnswerText}`;
+            }
+            
+            feedbackPopup.classList.add('show');
+            
+            // Update options display
+            showQuestion();
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < quizData.length - 1) {
+                currentQuestion++;
+                answered = false;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            score = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer === quizData[index].answer) {
+                    score++;
+                }
+            });
+            
+            const t = translations[currentLanguage];
+            document.getElementById('scoreDisplay').textContent = `${score}/${quizData.length}`;
+            
+            let scoreMessage;
+            if (score === quizData.length) {
+                scoreMessage = t.scoreExcellent;
+            } else if (score >= quizData.length * 0.7) {
+                scoreMessage = t.scoreGood;
+            } else if (score >= quizData.length * 0.5) {
+                scoreMessage = t.scoreFair;
+            } else {
+                scoreMessage = t.scorePoor;
+            }
+            
+            document.getElementById('scoreText').textContent = scoreMessage;
+            document.getElementById('quizContainer').style.display = 'none';
+            document.getElementById('resultsContainer').style.display = 'block';
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            userAnswers = Array(quizData.length).fill(null);
+            score = 0;
+            answered = false;
+            
+            document.getElementById('quizContainer').style.display = 'block';
+            document.getElementById('resultsContainer').style.display = 'none';
+            
+            showQuestion();
+        }
+
+        // Initialize event listeners
+        document.getElementById('feedbackContinue').addEventListener('click', function() {
+            document.getElementById('feedbackPopup').classList.remove('show');
+            nextQuestion();
+        });
+
+        document.getElementById('restartBtn').addEventListener('click', restartQuiz);
+
+        // Initialize quiz
+        // Language selector is shown by default
+        document.getElementById('quizContainer').style.display = 'none';
+        document.getElementById('resultsContainer').style.display = 'none';
+    </script>
+</body>
+</html>

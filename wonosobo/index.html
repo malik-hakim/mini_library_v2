@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart City Wonosobo - Implementation Explorer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            list-style: none;
+            text-decoration: none;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, 
+                rgba(15, 23, 42, 0.95) 0%, 
+                rgba(30, 41, 59, 0.98) 25%, 
+                rgba(51, 65, 85, 0.95) 50%,
+                rgba(30, 41, 59, 0.98) 75%,
+                rgba(15, 23, 42, 0.95) 100%
+            );
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Enhanced background effects */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+                linear-gradient(45deg, rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(-45deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: auto, auto, 60px 60px, 60px 60px;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        /* Floating particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 50%;
+            animation: particleFloat 15s infinite ease-in-out;
+        }
+        
+        .particle:nth-child(1) { width: 4px; height: 4px; left: 10%; animation-delay: 0s; }
+        .particle:nth-child(2) { width: 6px; height: 6px; left: 20%; animation-delay: 3s; }
+        .particle:nth-child(3) { width: 3px; height: 3px; left: 30%; animation-delay: 6s; }
+        .particle:nth-child(4) { width: 8px; height: 8px; left: 40%; animation-delay: 9s; }
+        .particle:nth-child(5) { width: 5px; height: 5px; left: 50%; animation-delay: 12s; }
+        .particle:nth-child(6) { width: 7px; height: 7px; left: 60%; animation-delay: 2s; }
+        .particle:nth-child(7) { width: 4px; height: 4px; left: 70%; animation-delay: 5s; }
+        .particle:nth-child(8) { width: 6px; height: 6px; left: 80%; animation-delay: 8s; }
+        .particle:nth-child(9) { width: 5px; height: 5px; left: 90%; animation-delay: 11s; }
+
+        /* Header Navigation */
+        .header-nav {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(16, 185, 129, 0.15));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            padding: 15px 30px;
+            z-index: 100;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: white;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(16, 185, 129, 0.3));
+        }
+
+        /* Main Title */
+        .main-title {
+            text-align: center;
+            padding: 120px 20px 60px;
+            color: white;
+            position: relative;
+            z-index: 10;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .main-title h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+            animation: titleGlow 3s ease-in-out infinite;
+        }
+
+        .main-title p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 400;
+        }
+
+        /* Explore Container */
+        .explore-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px 60px;
+        }
+
+        /* Slide Navigation */
+        .slide-nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 60px;
+        }
+
+        .slide-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.1));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .slide-btn:hover,
+        .slide-btn.active {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(16, 185, 129, 0.3));
+            color: white;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Slide Content */
+        .slide-content {
+            display: none;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .slide-content.active {
+            display: block;
+        }
+
+        .slide-header {
+            text-align: center;
+            margin-bottom: 50px;
+            color: white;
+        }
+
+        .slide-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .slide-header p {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Audio Player Styles */
+        .audio-player {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(16, 185, 129, 0.15));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+        }
+
+        .audio-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(16, 185, 129, 0.8));
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .audio-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
+        }
+
+        .audio-btn:active {
+            transform: scale(0.95);
+        }
+
+        .audio-info {
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .audio-title {
+            font-size: 0.9rem;
+            color: white;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .audio-progress {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .audio-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, rgba(59, 130, 246, 1), rgba(16, 185, 129, 1));
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .audio-time {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 5px;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .volume-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: rgba(59, 130, 246, 0.3);
+            border: none;
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .volume-btn:hover {
+            background: rgba(59, 130, 246, 0.5);
+        }
+
+        .volume-slider {
+            width: 80px;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            outline: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 1), rgba(16, 185, 129, 1));
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 1), rgba(16, 185, 129, 1));
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* Implementation Grid */
+        .implementation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        /* Implementation Cards */
+        .implementation-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(16, 185, 129, 0.15));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+        }
+
+        .implementation-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(59, 130, 246, 0.3);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(16, 185, 129, 0.25));
+        }
+
+        .card-image {
+            position: relative;
+            height: 250px;
+            overflow: hidden;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .implementation-card:hover .card-image img {
+            transform: scale(1.1);
+        }
+
+        .card-overlay {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(16, 185, 129, 0.9));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .card-content {
+            padding: 30px;
+            color: white;
+        }
+
+        .card-content h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .implementation-badges {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .badge.tech {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(16, 185, 129, 0.3));
+            color: white;
+        }
+
+        .badge.status {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(59, 130, 246, 0.3));
+            color: white;
+        }
+
+        .card-content p {
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 25px;
+        }
+
+        .card-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn-reference {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(16, 185, 129, 0.8));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            color: white;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-reference:hover {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 1), rgba(16, 185, 129, 1));
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Keyframe Animations */
+        @keyframes particleFloat {
+            0%, 100% { 
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10%, 90% {
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { 
+                filter: drop-shadow(0 0 10px rgba(255,255,255,0.1));
+            }
+            50% { 
+                filter: drop-shadow(0 0 20px rgba(255,255,255,0.3));
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-nav {
+                padding: 12px 20px;
+                gap: 20px;
+                flex-wrap: wrap;
+            }
+
+            .main-title h1 {
+                font-size: 2.5rem;
+            }
+
+            .implementation-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .explore-container {
+                padding: 0 20px 40px;
+            }
+
+            .slide-nav {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .slide-btn {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+
+            .audio-player {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .audio-info {
+                max-width: 100%;
+            }
+
+            .volume-control {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-title {
+                padding: 100px 15px 40px;
+            }
+
+            .main-title h1 {
+                font-size: 2rem;
+            }
+
+            .slide-header h2 {
+                font-size: 1.8rem;
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+<body>
+    <!-- Animated Particles -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <!-- Header Navigation -->
+    <nav class="header-nav">
+        <a href="#" class="nav-logo">
+            <i class="fas fa-city"></i>
+            <span>Smart Wonosobo</span>
+        </a>
+        <div class="nav-links">
+            <a href="../index.html" class="nav-link">
+                <i class="fas fa-home"></i>
+                <span>Beranda</span>
+            </a>
+            <a href="index.html" class="nav-link">
+                <i class="fas fa-city"></i>
+                <span>Implementation</span>
+            </a>
+            <a href="feedback.html" class="nav-link">
+                <i class="fas fa-comments"></i>
+                <span>Feedback</span>
+            </a>
+            <a href="pages.html" class="nav-link active">
+                <i class="fas fa-question-circle"></i>
+                <span>Quiz</span>
+            </a>
+            
+        </div>
+    </nav>
+
+    <!-- Main Title -->
+    <div class="main-title">
+        <h1>Smart City Implementation</h1>
+        <p>Discover Real Systems & Technologies Transforming Wonosobo</p>
+    </div>
+
+    <!-- Explore Container -->
+    <div class="explore-container">
+        <!-- Slide Navigation -->
+        <div class="slide-nav">
+            <button class="slide-btn active" data-slide="1">
+                <i class="fas fa-university"></i>
+                <span>Governance</span>
+            </button>
+            <button class="slide-btn" data-slide="2">
+                <i class="fas fa-leaf"></i>
+                <span>Environment</span>
+            </button>
+            <button class="slide-btn" data-slide="3">
+                <i class="fas fa-home"></i>
+                <span>Living</span>
+            </button>
+            <button class="slide-btn" data-slide="4">
+                <i class="fas fa-star"></i>
+                <span>Branding</span>
+            </button>
+            <button class="slide-btn" data-slide="5">
+                <i class="fas fa-chart-line"></i>
+                <span>Economy</span>
+            </button>
+            <button class="slide-btn" data-slide="6">
+                <i class="fas fa-users"></i>
+                <span>Society</span>
+            </button>
+        </div>
+
+        <!-- Slide 1: Smart Governance -->
+        <div class="slide-content active" id="slide-1">
+            <div class="slide-header">
+                <h2><i class="fas fa-university"></i> Smart Governance</h2>
+                <p>"Wonosobo Regency has implemented a smart governance system as a strategic step to realize intelligent and transparent governance."</p>
+                <div class="audio-player">
+                    <button class="audio-btn" data-audio="governance">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <div class="audio-info">
+                        <div class="audio-title">Smart Governance Overview</div>
+                        <div class="audio-progress">
+                            <div class="audio-progress-bar"></div>
+                        </div>
+                        <div class="audio-time">
+                            <span class="current-time">0:00</span>
+                            <span class="duration-time">1:20</span>
+                        </div>
+                    </div>
+                    <div class="volume-control">
+                        <button class="volume-btn">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <input type="range" class="volume-slider" min="0" max="100" value="70">
+                    </div>
+                </div>
+            </div>
+
+            <div class="implementation-grid">
+                <div class="implementation-card">
+                    <div class="card-image">
+                        <img src="../images/pandawa.png" alt="Pandawa Sakti">
+                        <div class="card-overlay">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3>Pandawa Sakti</h3>
+                        <div class="implementation-badges">
+                            <span class="badge tech">Online Service</span>
+                            <span class="badge status">Active</span>
+                        </div>
+                        <p>Pandawa Sakti is an online service innovation from the Wonosobo Population and Civil Registration Office that makes it easier for the public to manage population administration in a digital, integrated, real-time, and efficient manner, including document delivery tracking facilities.</p>
+                        <div class="card-features">
+                            <div class="feature">
+                                <i class="fas fa-clock"></i>
+                                <span>Real-time</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-file-alt"></i>
+                                <span>Document Tracking</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-mobile-alt"></i>
+                                <span>Digital Integration</span>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <a href="https://dukcapilonline.wonosobokab.go.id/" class="btn-reference" target="_blank">
+                                <i class="fas fa-external-link-alt"></i>
+                                Visit Site
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="implementation-card">
+                    <div class="card-image">
+                        <img src="../images/sitawon.png" alt="SITAWON System">
+                        <div class="card-overlay">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3>SITAWON (Sistem Informasi Pendapatan Wonosobo)</h3>
+                        <div class="implementation-badges">
+                            <span class="badge tech">Digital Platform</span>
+                            <span class="badge status">Active</span>
+                        </div>
+                        <p>SITAWON is a digital platform managed by the Wonosobo Regency Taxpayer Information and Development Agency (BPPKAD) to manage taxpayer data, simplify regional tax administration, and increase transparency and accountability in regional revenues.</p>
+                        <div class="card-features">
+                            <div class="feature">
+                                <i class="fas fa-database"></i>
+                                <span>Data Management</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Transparency</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-mobile-alt"></i>
+                                <span>Digital Access</span>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <a href="https://sitawon.wonosobokab.go.id/monitoring" class="btn-reference" target="_blank">
+                                <i class="fas fa-external-link-alt"></i>
+                                Visit Site
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="implementation-card">
+                    <div class="card-image">
+                        <img src="../images/jdih.png" alt="JDIH System">
+                        <div class="card-overlay">
+                            <i class="fas fa-gavel"></i>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3>JDIH (Jaringan Dokumentasi dan Informasi Hukum)</h3>
+                        <div class="implementation-badges">
+                            <span class="badge tech">Legal Database</span>
+                            <span class="badge status">Active</span>
+                        </div>
+                        <p>JDIH Wonosobo Regency is a public information system that provides access to various legal documents, such as regional regulations, regent regulations, decrees, instructions, circulars, village regulations, and other legal products to support legal transparency.</p>
+                        <div class="card-features">
+                            <div class="feature">
+                                <i class="fas fa-search"></i>
+                                <span>Document Search</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-file-alt"></i>
+                                <span>Legal Archive</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-users"></i>
+                                <span>Public Access</span>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <a href="https://jdih.wonosobokab.go.id/" class="btn-reference" target="_blank">
+                                <i class="fas fa-external-link-alt"></i>
+                                Visit Site
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Smart Environment -->
+        <div class="slide-content" id="slide-2">
+            <div class="slide-header">
+                <h2><i class="fas fa-leaf"></i> Smart Environment</h2>
+                <p>"Environmental monitoring and sustainable agriculture systems to ensure efficient and modern development in Wonosobo."</p>
+                <div class="audio-player">
+                    <button class="audio-btn" data-audio="environment">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <div class="audio-info">
+                        <div class="audio-title">Smart Environment Overview</div>
+                        <div class="audio-progress">
+                            <div class="audio-progress-bar"></div>
+                        </div>
+                        <div class="audio-time">
+                            <span class="current-time">0:00</span>
+                            <span class="duration-time">1:00</span>
+                        </div>
+                    </div>
+                    <div class="volume-control">
+                        <button class="volume-btn">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <input type="range" class="volume-slider" min="0" max="100" value="70">
+                    </div>
+                </div>
+            </div>
+
+            <div class="implementation-grid">
+                <div class="implementation-card">
+                    <div class="card-image">
+                        <img src="../images/greenhouse.png" alt="Smart Greenhouse">
+                        <div class="card-overlay">
+                            <i class="fas fa-seedling"></i>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3>Smart Greenhouse</h3>
+                        <div class="implementation-badges">
+                            <span class="badge tech">Agriculture Tech</span>
+                            <span class="badge status">Active</span>
+                        </div>
+                        <p>The Smart Greenhouse in Wonosobo was developed to create efficient and modern agriculture through advanced technology that can increase crop yields at low cost. This program serves as a research platform and attracts younger generation to see agriculture as profitable and sustainable.</p>
+                        <div class="card-features">
+                            <div class="feature">
+                                <i class="fas fa-chart-line"></i>
+                                <span>High Yield</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-dollar-sign"></i>
+                                <span>Low Cost</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-leaf"></i>
+                                <span>Sustainable</span>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <a href="https://radarmagelang.jawapos.com/wonosobo/685131476/terapkan-smart-greenhouse-petani-milenial-wonosobo-sukses-bertanam-melon-modal-rp-4-juta-panen-bisa-rp-20-juta" class="btn-reference" target="_blank">
+                                <i class="fas fa-info-circle"></i>
+                                Learn More
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Smart Living -->
+        <div class="slide-content" id="slide-3">
+            <div class="slide-header">
+                <h2><i class="fas fa-home"></i> Smart Living</h2>
+                <p>"Enhancing quality of life through intelligent disaster management and public safety monitoring systems for Wonosobo citizens."</p>
+                <div class="audio-player">
+                    <button class="audio-btn" data-audio="living">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <div class="audio-info">
+                        <div class="audio-title">Smart Living Overview</div>
+                        <div class="audio-progress">
+                            <div class="audio-progress-bar"></div>
+                        </div>
+                        <div class="audio-time">
+                            <span class="current-time">0:00</span>
+                            <span class="duration-time">1:32</span>
+                        </div>
+                    </div>
+                    <div class="volume-control">
+                        <button class="volume-btn">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <input type="range" class="volume-slider" min="0" max="100" value="70">
+                    </div>
+                </div>
+            </div>
+
+            <div class="implementation-grid">
+                <div class="implementation-card">
+                    <div class="card-image">
+                        <img src="../images/map.png" alt="SIKK Wonosobo">
+                        <div class="card-overlay">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3>SIKK Wonosobo (Sistem Informasi Kebencanaan Kabupaten)</h3>
+                        <div class="implementation-badges">
+                            <span class="badge tech">Disaster Management</span>
+                            <span class="badge status">Active</span>
+                        </div>
+                        <p>SIKK is a digital platform owned by the Wonosobo Regency Regional Disaster Management Agency (BPBD) that monitors, records, and visually presents disaster data through maps, tables, and graphs to provide fast, transparent disaster information.</p>
+                        <div class="card-features">
+                            <div class="feature">
+                                <i class="fas fa-map"></i>
+                                <span>Visual Mapping</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-chart-bar"></i>
+                                <span>Data Analytics</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-clock"></i>
+                                <span>Real-time Monitoring</span>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <a href="https://sikk.wonosobokab.go.id/" class="btn-reference" target="_blank">
+                                <i class="fas fa-external-link-alt"></i>
+                                Visit Site
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="implementation-card">
+                    <div class="card-image">
+                        <img src="../images/cctv.png" alt="Public CCTV">
+                        <div class="card-overlay">
+                            <i class="fas fa-video"></i>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3>CCTV Publik Wonosobo</h3>
+                        <div class="implementation-badges">
+                            <span class="badge tech">Surveillance System</span>
+                            <span class="badge status">Active</span>
+                        </div>
+                        <p>Wonosobo Public CCTV is a visual surveillance platform consisting of public cameras installed in various locations (including watchtowers) to monitor public conditions in real time, improve security, and expedite emergency responses.</p>
+                        <div class="card-features">
+                            <div class="feature">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Public Security</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-eye"></i>
+                                <span>24/7 Monitoring</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-ambulance"></i>
+                                <span>Emergency Response</span>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <a href="https://cctv.wonosobokab.go.id/" class="btn-reference" target="_blank">
+                                <i class="fas fa-external-link-alt"></i>
+                                View Live
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Smart Branding -->
+        <div class="slide-content" id="slide-4">
+            <div class="slide-header">
+                <h2><i class="fas fa-star"></i> Smart Branding</h2>
+                <p>"Promoting Wonosobo's digital transformation through online licensing and government service digitalization."</p>
+                <div class="audio-player">
+                    <button class="audio-btn" data-audio="branding">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <div class="audio-info">
+                        <div class="audio-title">Smart Branding Overview</div>
+                        <div class="audio-progress">
+                            <div class="audio-progress-bar"></div>
+                        </div>
+                        <div class="audio-time">
+                            <span class="current-time">0:00</span>
+                            <span class="duration-time">0:50</span>
+                        </div>
+                    </div>
+                    <div class="volume-control">
+                        <button class="volume-btn">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <input type="range" class="volume-slider" min="0" max="100" value="70">
+                    </div>
+                </div>
+            </div>
+
+            <div class="implementation-grid">
+                <div class="implementation-card">
+                    <div class="card-image">
+                        <img src="../images/aprizob.png" alt="APRIZOB">
+                        <div class="card-overlay">
+                            <i class="fas fa-file-signature"></i>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3>APRIZOB (Aplikasi Perizinan Online Wonosobo)</h3>
+                        <div class="implementation-badges">
+                            <span class="badge tech">Online Licensing</span>
+                            <span class="badge status">Active</span>
+                        </div>
+                        <p>APRIZOB is a digital system owned by the Wonosobo Regency Government through DPMPTSP, facilitating the public in processing permits online including registration, document submission, viewing service standards, validation using Electronic Signatures (TTE), and permit mapping.</p>
+                        <div class="card-features">
+                            <div class="feature">
+                                <i class="fas fa-digital-signature"></i>
+                                <span>Electronic Signature</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-file-upload"></i>
+                                <span>Online Submission</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-map"></i>
+                                <span>Permit Mapping</span>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <a href="https://aprizob.wonosobokab.go.id" class="btn-reference" target="_blank">
+                                <i class="fas fa-external-link-alt"></i>
+                                Visit Site
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Smart Economy -->
+        <div class="slide-content" id="slide-5">
+            <div class="slide-header">
+                <h2><i class="fas fa-chart-line"></i> Smart Economy</h2>
+                <p>"Driving economic growth through digital transformation and support for local businesses and MSMEs in Wonosobo."</p>
+             <div class="audio-player">
+                    <button class="audio-btn" data-audio="Economy">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <div class="audio-info">
+                        <div class="audio-title">Smart Economy Overview</div>
+                        <div class="audio-progress">
+                            <div class="audio-progress-bar"></div>
+                        </div>
+                        <div class="audio-time">
+                            <span class="current-time">0:00</span>
+                            <span class="duration-time">1:22</span>
+                        </div>
+                    </div>
+                    <div class="volume-control">
+                        <button class="volume-btn">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <input type="range" class="volume-slider" min="0" max="100" value="70">
+                    </div>
+                </div>
+            </div>
+
+            <div class="implementation-grid">
+                <div class="implementation-card">
+                    <div class="card-image">
+                        <img src="../images/ayopromo.png" alt="AyoPromo Platform">
+                        <div class="card-overlay">
+                            <i class="fas fa-bullhorn"></i>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3>AyoPromo</h3>
+                        <div class="implementation-badges">
+                            <span class="badge tech">Digital Marketing</span>
+                            <span class="badge status">Active</span>
+                        </div>
+                        <p>The AyoPromo digital platform in Wonosobo was created to support the Smart Economy by helping MSMEs promote their products digitally, expanding market access, and collecting data on businesses across sectors. This innovation increases competitiveness and drives regional economic growth.</p>
+                        <div class="card-features">
+                            <div class="feature">
+                                <i class="fas fa-store"></i>
+                                <span>MSME Support</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-globe"></i>
+                                <span>Market Expansion</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-chart-bar"></i>
+                                <span>Business Data</span>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <a href="https://ayopromo.com/" class="btn-reference" target="_blank">
+                                <i class="fas fa-external-link-alt"></i>
+                                Visit Platform
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="implementation-card">
+                    <div class="card-image">
+                        <img src="../images/disdagkop.png" alt="Disdagkop UKM Wonosobo">
+                        <div class="card-overlay">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3>Disdagkop UKM Wonosobo</h3>
+                        <div class="implementation-badges">
+                            <span class="badge tech">Government Portal</span>
+                            <span class="badge status">Active</span>
+                        </div>
+                        <p>The Wonosobo Trade, Cooperatives, and MSMEs Office website serves as a central information portal providing organizational profiles, regulations, commodity and market price data, public complaint services, and transparency through PPID services.</p>
+                        <div class="card-features">
+                            <div class="feature">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Market Data</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-balance-scale"></i>
+                                <span>Regulations</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-comments"></i>
+                                <span>Public Services</span>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <a href="https://disdagkopukm.wonosobokab.go.id/" class="btn-reference" target="_blank">
+                                <i class="fas fa-external-link-alt"></i>
+                                Visit Portal
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Smart Society -->
+        <div class="slide-content" id="slide-6">
+            <div class="slide-header">
+                <h2><i class="fas fa-users"></i> Smart Society</h2>
+                <p>"Building an inclusive digital society through citizen engagement and transparent communication platforms between government and community."</p>
+                <div class="audio-player">
+                    <button class="audio-btn" data-audio="society">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <div class="audio-info">
+                        <div class="audio-title">Smart Society Overview</div>
+                        <div class="audio-progress">
+                            <div class="audio-progress-bar"></div>
+                        </div>
+                        <div class="audio-time">
+                            <span class="current-time">0:00</span>
+                            <span class="duration-time">0:55</span>
+                        </div>
+                    </div>
+                    <div class="volume-control">
+                        <button class="volume-btn">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <input type="range" class="volume-slider" min="0" max="100" value="70">
+                    </div>
+                </div>
+            </div>
+
+            <div class="implementation-grid">
+                <div class="implementation-card">
+                    <div class="card-image">
+                        <img src="../images/laporbup.png" alt="LaporBup">
+                        <div class="card-overlay">
+                            <i class="fas fa-comment-alt"></i>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3>LaporBup</h3>
+                        <div class="implementation-badges">
+                            <span class="badge tech">Complaint System</span>
+                            <span class="badge status">Active</span>
+                        </div>
+                        <p>LaporBup is a digital-based public complaints system that makes it easy for citizens to submit complaints, suggestions, or input regarding public services through various channels, with guaranteed identity confidentiality, complaint tracking features, and integration with provincial and central government complaint systems.</p>
+                        <div class="card-features">
+                            <div class="feature">
+                                <i class="fas fa-user-secret"></i>
+                                <span>Identity Protection</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-search"></i>
+                                <span>Complaint Tracking</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-network-wired"></i>
+                                <span>Multi-level Integration</span>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <a href="https://laporbupati.wonosobokab.go.id/" class="btn-reference" target="_blank">
+                                <i class="fas fa-external-link-alt"></i>
+                                Submit Report
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Audio Management
+        const audioFiles = {
+            governance: '../audio/governance.m4a',
+            environment: '../audio/environment.mp3',
+            living: '../audio/living.mp3',
+            branding: '../audio/branding.mp3',
+            Economy: '../audio/Economy.mp3',
+            society: '../audio/society.mp3'
+        };
+
+        let currentAudio = null;
+        let currentButton = null;
+
+        // Initialize audio players
+        function initAudioPlayers() {
+            const audioButtons = document.querySelectorAll('.audio-btn');
+            
+            audioButtons.forEach(button => {
+                const audioType = button.getAttribute('data-audio');
+                const audioPlayer = button.closest('.audio-player');
+                const progressBar = audioPlayer.querySelector('.audio-progress-bar');
+                const progressContainer = audioPlayer.querySelector('.audio-progress');
+                const currentTimeEl = audioPlayer.querySelector('.current-time');
+                const durationTimeEl = audioPlayer.querySelector('.duration-time');
+                const volumeBtn = audioPlayer.querySelector('.volume-btn');
+                const volumeSlider = audioPlayer.querySelector('.volume-slider');
+                
+                button.addEventListener('click', function() {
+                    const audioSrc = audioFiles[audioType];
+                    
+                    // If clicking the same button, toggle play/pause
+                    if (currentAudio && currentButton === button) {
+                        if (currentAudio.paused) {
+                            currentAudio.play();
+                            button.innerHTML = '<i class="fas fa-pause"></i>';
+                        } else {
+                            currentAudio.pause();
+                            button.innerHTML = '<i class="fas fa-play"></i>';
+                        }
+                        return;
+                    }
+                    
+                    // Stop current audio if playing different one
+                    if (currentAudio) {
+                        currentAudio.pause();
+                        currentAudio.currentTime = 0;
+                        if (currentButton) {
+                            currentButton.innerHTML = '<i class="fas fa-play"></i>';
+                        }
+                    }
+                    
+                    // Create and play new audio
+                    currentAudio = new Audio(audioSrc);
+                    currentButton = button;
+                    currentAudio.volume = volumeSlider.value / 100;
+                    
+                    currentAudio.play();
+                    button.innerHTML = '<i class="fas fa-pause"></i>';
+                    
+                    // Update duration when loaded
+                    currentAudio.addEventListener('loadedmetadata', function() {
+                        durationTimeEl.textContent = formatTime(currentAudio.duration);
+                    });
+                    
+                    // Update progress bar
+                    currentAudio.addEventListener('timeupdate', function() {
+                        const progress = (currentAudio.currentTime / currentAudio.duration) * 100;
+                        progressBar.style.width = progress + '%';
+                        currentTimeEl.textContent = formatTime(currentAudio.currentTime);
+                    });
+                    
+                    // Reset when ended
+                    currentAudio.addEventListener('ended', function() {
+                        button.innerHTML = '<i class="fas fa-play"></i>';
+                        progressBar.style.width = '0%';
+                        currentTimeEl.textContent = '0:00';
+                        currentAudio = null;
+                        currentButton = null;
+                    });
+                    
+                    // Handle errors
+                    currentAudio.addEventListener('error', function() {
+                        alert('Audio file not found: ' + audioSrc + '\n\nPlease make sure the audio file exists in the ../audio/ folder.');
+                        button.innerHTML = '<i class="fas fa-play"></i>';
+                        currentAudio = null;
+                        currentButton = null;
+                    });
+                });
+                
+                // Progress bar click to seek
+                progressContainer.addEventListener('click', function(e) {
+                    if (currentAudio && currentButton === button) {
+                        const rect = progressContainer.getBoundingClientRect();
+                        const percent = (e.clientX - rect.left) / rect.width;
+                        currentAudio.currentTime = percent * currentAudio.duration;
+                    }
+                });
+                
+                // Volume control
+                volumeSlider.addEventListener('input', function() {
+                    if (currentAudio && currentButton === button) {
+                        currentAudio.volume = this.value / 100;
+                    }
+                    
+                    // Update volume icon
+                    const volumeIcon = volumeBtn.querySelector('i');
+                    if (this.value == 0) {
+                        volumeIcon.className = 'fas fa-volume-mute';
+                    } else if (this.value < 50) {
+                        volumeIcon.className = 'fas fa-volume-down';
+                    } else {
+                        volumeIcon.className = 'fas fa-volume-up';
+                    }
+                });
+                
+                // Mute toggle
+                volumeBtn.addEventListener('click', function() {
+                    const volumeIcon = this.querySelector('i');
+                    if (volumeSlider.value > 0) {
+                        volumeSlider.dataset.prevVolume = volumeSlider.value;
+                        volumeSlider.value = 0;
+                        volumeIcon.className = 'fas fa-volume-mute';
+                    } else {
+                        volumeSlider.value = volumeSlider.dataset.prevVolume || 70;
+                        volumeIcon.className = 'fas fa-volume-up';
+                    }
+                    
+                    if (currentAudio && currentButton === button) {
+                        currentAudio.volume = volumeSlider.value / 100;
+                    }
+                });
+            });
+        }
+        
+        // Format time helper
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return mins + ':' + (secs < 10 ? '0' : '') + secs;
+        }
+
+        // Slide Navigation Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize audio players
+            initAudioPlayers();
+            
+            const slideButtons = document.querySelectorAll('.slide-btn');
+            const slideContents = document.querySelectorAll('.slide-content');
+            
+            slideButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const slideNumber = this.getAttribute('data-slide');
+                    
+                    // Stop current audio when switching slides
+                    if (currentAudio) {
+                        currentAudio.pause();
+                        currentAudio.currentTime = 0;
+                        if (currentButton) {
+                            currentButton.innerHTML = '<i class="fas fa-play"></i>';
+                        }
+                        currentAudio = null;
+                        currentButton = null;
+                    }
+                    
+                    // Remove active class from all buttons and contents
+                    slideButtons.forEach(btn => btn.classList.remove('active'));
+                    slideContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to clicked button and corresponding content
+                    this.classList.add('active');
+                    document.getElementById(`slide-${slideNumber}`).classList.add('active');
+                });
+            });
+
+            // Enhanced card interactions
+            const cards = document.querySelectorAll('.implementation-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-15px) scale(1.03)';
+                    this.style.zIndex = '10';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                    this.style.zIndex = '1';
+                });
+            });
+
+            // Button hover effects
+            const buttons = document.querySelectorAll('.btn-reference, .slide-btn');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px) scale(1.05)';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+                
+                button.addEventListener('click', function(e) {
+                    // Create ripple effect
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+                    
+                    ripple.style.cssText = `
+                        position: absolute;
+                        width: ${size}px;
+                        height: ${size}px;
+                        left: ${x}px;
+                        top: ${y}px;
+                        background: rgba(255, 255, 255, 0.3);
+                        border-radius: 50%;
+                        transform: scale(0);
+                        animation: ripple 0.6s ease-out;
+                        pointer-events: none;
+                    `;
+                    
+                    this.style.position = 'relative';
+                    this.style.overflow = 'hidden';
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => ripple.remove(), 600);
+                });
+            });
+
+            // Intersection Observer for animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all cards
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                observer.observe(card);
+            });
+
+            // Add staggered animation delay to cards
+            cards.forEach((card, index) => {
+                card.style.transitionDelay = `${index * 0.1}s`;
+            });
+
+            console.log('Smart City Implementation Explorer with Audio initialized successfully!');
+        });
+    </script>
+</body>
+</html>
